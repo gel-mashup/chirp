@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: chirp_db
+    environment:
+      POSTGRES_USER: chirp_user
+      POSTGRES_PASSWORD: chirp_password
+      POSTGRES_DB: chirp_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chirp_user -d chirp_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: chirp_app
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://chirp_user:chirp_password@db:5432/chirp_db?schema=public
+      NEXTAUTH_SECRET: your-secret-key-change-in-production
+      NEXTAUTH_URL: http://localhost:3000
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

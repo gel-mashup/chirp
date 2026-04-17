@@ -1,0 +1,11 @@
+node_modules
+.next
+.env*.local
+*.log
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+.DS_Store
+EXAM_DETAILS.md
+SPEC.md
+HR-GUIDELINES.md
