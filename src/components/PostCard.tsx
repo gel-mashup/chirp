@@ -1,49 +1,54 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { Post } from '@/types'
+import { useEffect, useState } from "react";
+import { Post } from "@/types";
 
 interface PostCardProps {
-  post: Post
-  currentUserId?: string
+  post: Post;
+  currentUserId?: string;
 }
 
 export default function PostCard({ post, currentUserId }: PostCardProps) {
-  const [isLiked, setIsLiked] = useState(false)
-  const [likeCount, setLikeCount] = useState(post._count?.likes || post.likes?.length || 0)
-  const [isLiking, setIsLiking] = useState(false)
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(
+    post._count?.likes || post.likes?.length || 0,
+  );
+  const [isLiking, setIsLiking] = useState(false);
 
   useEffect(() => {
     if (currentUserId && post.likes) {
-      setIsLiked(post.likes.some((like) => like.userId === currentUserId))
+      setIsLiked(post.likes.some((like) => like.userId === currentUserId));
     }
-  }, [currentUserId, post.likes])
+  }, [currentUserId, post.likes]);
 
   const handleLike = async () => {
-    if (isLiking || !currentUserId) return
+    if (isLiking || !currentUserId) return;
 
-    setIsLiking(true)
-    setIsLiked(!isLiked)
-    setLikeCount(isLiked ? likeCount - 1 : likeCount + 1)
+    const prevIsLiked = isLiked;
+    const prevLikeCount = likeCount;
+
+    setIsLiking(true);
+    setIsLiked(!isLiked);
+    setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
 
     try {
       await fetch(`/api/posts/${post.id}/like`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: currentUserId }),
-      })
+      });
     } catch (error) {
-      setIsLiked(!isLiked)
-      setLikeCount(isLiked ? likeCount + 1 : likeCount - 1)
+      setIsLiked(prevIsLiked);
+      setLikeCount(prevLikeCount);
     } finally {
-      setIsLiking(false)
+      setIsLiking(false);
     }
-  }
+  };
 
-  const formattedDate = new Date(post.createdAt).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-  })
+  const formattedDate = new Date(post.createdAt).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
 
   return (
     <div className="bg-white p-4 rounded-lg shadow mb-4">
@@ -63,12 +68,12 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
             <button
               onClick={handleLike}
               className={`flex items-center gap-1 transition ${
-                isLiked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'
+                isLiked ? "text-red-500" : "text-gray-500 hover:text-red-500"
               }`}
             >
               <svg
                 className="w-5 h-5"
-                fill={isLiked ? 'currentColor' : 'none'}
+                fill={isLiked ? "currentColor" : "none"}
                 stroke="currentColor"
                 viewBox="0 0 24 24"
               >
@@ -82,7 +87,12 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
               <span>{likeCount}</span>
             </button>
             <button className="flex items-center gap-1 text-gray-500 hover:text-primary transition">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -96,5 +106,5 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }
