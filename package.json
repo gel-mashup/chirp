@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Twitter-like entrance exam application with intentional bugs",
   "private": true,
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
