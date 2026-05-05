@@ -13,7 +13,7 @@ export async function createPost(content: string) {
   await prisma.post.create({
     data: {
       content,
-      authorId: 'demo-user-id',
+      authorId: sessionUserId,
     },
   })
 
