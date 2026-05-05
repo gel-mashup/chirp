@@ -32,11 +32,15 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
     setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
 
     try {
-      await fetch(`/api/posts/${post.id}/like`, {
+      const res = await fetch(`/api/posts/${post.id}/like`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: currentUserId }),
       });
+      if (!res.ok) {
+        setIsLiked(prevIsLiked);
+        setLikeCount(prevLikeCount);
+      }
     } catch (error) {
       setIsLiked(prevIsLiked);
       setLikeCount(prevLikeCount);

@@ -1,29 +1,39 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { createPost } from '@/lib/actions'
+import { useState } from "react";
+import { createPost } from "@/lib/actions";
 
 export default function CreatePost() {
-  const [content, setContent] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [content, setContent] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!content.trim()) return
+    e.preventDefault();
+    if (!content.trim()) return;
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
+    setError("");
     try {
-      await createPost(content)
-      setContent('')
-    } catch (error) {
-      console.error('Failed to create post:', error)
+      await createPost(content);
+      setContent("");
+    } catch (err: any) {
+      setError(err?.message || "Failed to create post. Are you signed in?");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-4 rounded-lg shadow mb-4">
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white p-4 rounded-lg shadow mb-4"
+    >
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mb-2 text-sm">
+          {error}
+        </div>
+      )}
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
@@ -32,15 +42,19 @@ export default function CreatePost() {
         rows={3}
       />
       <div className="flex justify-between items-center mt-2">
-        <span className="text-gray-500 text-sm">{content.length}/280</span>
+        <span
+          className={`text-sm ${content.length > 280 ? "text-red-500" : "text-gray-500"}`}
+        >
+          {content.length}/280
+        </span>
         <button
           type="submit"
-          disabled={isSubmitting || content.length > 280}
+          disabled={isSubmitting || content.length > 280 || !content.trim()}
           className="bg-primary text-white px-4 py-2 rounded-full hover:bg-blue-600 disabled:opacity-50"
         >
-          {isSubmitting ? 'Posting...' : 'Chirp'}
+          {isSubmitting ? "Posting..." : "Chirp"}
         </button>
       </div>
     </form>
-  )
+  );
 }

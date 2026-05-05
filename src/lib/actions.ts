@@ -24,7 +24,15 @@ export async function getTimeline(userId?: string) {
   const posts = await prisma.post.findMany({
     orderBy: { createdAt: "desc" },
     include: {
-      author: true,
+      author: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          bio: true,
+          createdAt: true,
+        },
+      },
       likes: true,
     },
   });
@@ -43,7 +51,15 @@ export async function getUserProfile(username: string) {
     where: { authorId: user.id },
     orderBy: { createdAt: "desc" },
     include: {
-      author: true,
+      author: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          bio: true,
+          createdAt: true,
+        },
+      },
       likes: true,
     },
   });
@@ -67,7 +83,12 @@ export async function searchUsers(query: string) {
         { email: { contains: query, mode: "insensitive" } },
       ],
     },
-    include: {
+    select: {
+      id: true,
+      username: true,
+      email: true,
+      bio: true,
+      createdAt: true,
       posts: {
         include: {
           likes: true,
@@ -107,22 +128,51 @@ export async function toggleFollow(followerId: string, followingId: string) {
 
 export async function getExploreUsers() {
   const users = await prisma.user.findMany({
-    include: {
+    select: {
+      id: true,
+      username: true,
+      email: true,
+      bio: true,
+      createdAt: true,
       posts: {
         include: {
           likes: true,
-          author: true,
+          author: {
+            select: {
+              id: true,
+              username: true,
+              email: true,
+              bio: true,
+              createdAt: true,
+            },
+          },
         },
         orderBy: { createdAt: "desc" },
       },
       followers: {
         include: {
-          follower: true,
+          follower: {
+            select: {
+              id: true,
+              username: true,
+              email: true,
+              bio: true,
+              createdAt: true,
+            },
+          },
         },
       },
       following: {
         include: {
-          following: true,
+          following: {
+            select: {
+              id: true,
+              username: true,
+              email: true,
+              bio: true,
+              createdAt: true,
+            },
+          },
         },
       },
     },

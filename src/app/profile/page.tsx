@@ -1,35 +1,54 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from "react";
 
 export default function ProfilePage() {
-  const [profile, setProfile] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+  const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/users/alice')
+    const stored = localStorage.getItem("user");
+    if (!stored) {
+      setLoading(false);
+      return;
+    }
+
+    let currentUser: { username?: string } = {};
+    try {
+      currentUser = JSON.parse(stored);
+    } catch {
+      setLoading(false);
+      return;
+    }
+
+    if (!currentUser.username) {
+      setLoading(false);
+      return;
+    }
+
+    fetch(`/api/users/${currentUser.username}`)
       .then((res) => res.json())
       .then((data) => {
-        setProfile(data)
-        setLoading(false)
+        setProfile(data);
+        setLoading(false);
       })
-      .catch(() => setLoading(false))
-  }, [])
+      .catch(() => setLoading(false));
+  }, []);
 
   if (loading) {
     return (
       <div className="max-w-2xl mx-auto py-4 px-4">
         <p className="text-center">Loading...</p>
       </div>
-    )
+    );
   }
 
-  if (!profile) {
+  if (!profile || !profile.user) {
     return (
       <div className="max-w-2xl mx-auto py-4 px-4">
         <p className="text-center">User not found</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -45,11 +64,11 @@ export default function ProfilePage() {
             {profile.user.bio && <p className="mt-2">{profile.user.bio}</p>}
             <div className="flex gap-6 mt-4 text-sm">
               <span>
-                <strong>{profile.followersCount}</strong>{' '}
+                <strong>{profile.followersCount}</strong>{" "}
                 <span className="text-gray-500">Followers</span>
               </span>
               <span>
-                <strong>{profile.followingCount}</strong>{' '}
+                <strong>{profile.followingCount}</strong>{" "}
                 <span className="text-gray-500">Following</span>
               </span>
             </div>
@@ -72,5 +91,5 @@ export default function ProfilePage() {
         ))}
       </div>
     </div>
-  )
+  );
 }
