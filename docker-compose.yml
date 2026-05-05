@@ -7,11 +7,11 @@ services:
       POSTGRES_PASSWORD: chirp_password
       POSTGRES_DB: chirp_db
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U chirp_user -d chirp_db"]
+      test: ['CMD-SHELL', 'pg_isready -U chirp_user -d chirp_db']
       interval: 5s
       timeout: 5s
       retries: 5
@@ -20,9 +20,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      command: sh -c "npx prisma db push && npm run dev"
     container_name: chirp_app
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
       DATABASE_URL: postgresql://chirp_user:chirp_password@db:5432/chirp_db?schema=public
       NEXTAUTH_SECRET: your-secret-key-change-in-production
